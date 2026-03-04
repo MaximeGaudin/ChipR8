@@ -1,3 +1,5 @@
+use std::error::Error;
+
 struct VM {}
 
 // 0nnn - SYS addr
@@ -50,7 +52,7 @@ impl Return {
     fn documentation(&self) -> Vec<&str> {
         vec![
             "Return from a subroutine.",
-            "The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer."
+            "The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.",
         ]
     }
 
@@ -72,7 +74,7 @@ impl Jump {
     fn documentation(&self) -> Vec<&str> {
         vec![
             "Jump to location nnn.",
-            "The interpreter sets the program counter to nnn."
+            "The interpreter sets the program counter to nnn.",
         ]
     }
 
@@ -89,7 +91,9 @@ impl Unknown {
         format!("UNKNOWN: {:04X}", self.opcode)
     }
 
-    fn documentation(&self) -> String {}
+    fn documentation(&self) -> Vec<&str> {
+        vec!["A unknown or not implemented instruction"]
+    }
 
     fn executable(&self, vm: &mut VM) {
         // Nothing to do
@@ -119,20 +123,19 @@ fn opcode_to_instruction(opcode: u16) -> Instruction {
     }
 }
 
-fn load_rom(path: &str) -> Vec<Instruction> {
-    let content = std::fs::read(path).unwrap();
+fn load_rom(path: String) -> Result<Vec<u16>, std::io::Error> {
+    let content = std::fs::read(path)?;
 
-    content
+    Ok(content
         .chunks_exact(2)
-        .map(|chunk| {
-            let opcode = ((chunk[0] as u16) << 8) | (chunk[1] as u16);
-            opcode_to_instruction(opcode)
-        })
-        .collect()
+        .map(|chunk| {((chunk[0] as u16) << 8) | (chunk[1] as u16) })
+        .collect())
 }
 
-fn main() {
-    let instructions = load_rom("roms/corax89.ch8");
+fn main() -> Result<(),  Box<dyn Error>>{
+    let instructions : Vec<Instruction> = load_rom("roms/corax89.ch8".to_string())?.iter()
+        .map(|o| opcode_to_instruction(*o))
+        .collect();
 
     for instruction in &instructions {
         println!("{}", instruction.disassemble())
@@ -146,4 +149,43 @@ fn main() {
 
     println!("Total instructions: {}", instructions_count);
     println!("Total UNK instructions: {}", unknown_count);
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::error::Error;
+
+    use crate::load_rom;
+
+    #[test]
+    fn test_rom_content_read() {
+        let rom_prefix = "roms/corax89";
+        let reference_opcodes = to_opcodes(format!("{}.dis", rom_prefix)).unwrap();
+        let opcodes = load_rom(format!("{}.ch8", rom_prefix)).unwrap();
+
+        assert_eq!(reference_opcodes, opcodes);
+    }
+
+    fn to_opcodes(path: String) -> Result<Vec<u16>, Box<dyn Error>> {
+        let content = std::fs::read_to_string(path)?;
+        let bytes: Vec<u8> = content
+            .split_whitespace()
+            .filter(|s| !s.is_empty())
+            .filter_map(|s| {
+                // Remove "0x" and try to parse
+                let hex = s.trim_start_matches("0x");
+                u8::from_str_radix(hex, 16).ok()
+            })
+            .collect();
+
+        Ok(bytes
+            .chunks_exact(2)
+            .map(|chunk| {
+                // byte1 = high bits, byte2 = low bits
+                ((chunk[0] as u16) << 8) | (chunk[1] as u16)
+            })
+            .collect())
+    }
 }
