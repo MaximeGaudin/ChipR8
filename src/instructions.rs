@@ -36,7 +36,7 @@ impl ClearScreen {
     }
 
     fn execute(&self, vm: &mut VM) {
-        // TODO
+        vm.memory.fill(0);
     }
 }
 
@@ -94,13 +94,14 @@ impl Unknown {
         vec!["A unknown or not implemented instruction"]
     }
 
-    fn executable(&self, vm: &mut VM) {
+    fn execute(&self, vm: &mut VM) {
         // Nothing to do
     }
 }
 
 pub enum Instruction {
     JMP(Jump),
+    CLS(ClearScreen),
     UNK(Unknown),
 }
 
@@ -108,7 +109,16 @@ impl Instruction {
     pub fn disassemble(&self) -> String {
         match self {
             Instruction::JMP(i) => i.disassemble(),
+            Instruction::CLS(i) => i.disassemble(),
             Instruction::UNK(i) => i.disassemble(),
+        }
+    }
+
+    pub fn execute(&self, vm: &mut VM) {
+        match self {
+            Instruction::JMP(i) => i.execute(vm),
+            Instruction::CLS(i) => i.execute(vm),
+            Instruction::UNK(i) => i.execute(vm),
         }
     }
 }
