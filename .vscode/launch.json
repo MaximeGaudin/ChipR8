@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'Chip R8'",
+            "cargo": {
+                "args": ["build", "--bin=ChipR8", "--package=ChipR8"],
+                "filter": { "name": "ChipR8", "kind": "bin" }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

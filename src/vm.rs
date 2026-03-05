@@ -25,6 +25,8 @@ const PROGRAM_START: usize = 0x200;
 pub struct VM {
     pub memory: [u8; 4096],
     pub screen: [u8; SCREEN_WIDTH * SCREEN_HEIGHT],
+    pub registers: [u8; 16],
+    pub i: u16,
     pub program_counter: usize,
 }
 
@@ -32,6 +34,8 @@ pub fn init() -> VM {
     let mut vm = VM {
         memory: [0; 4096],
         screen: [0; SCREEN_WIDTH * SCREEN_HEIGHT],
+        registers: [0; 16],
+        i: 0,
         program_counter: PROGRAM_START,
     };
 
@@ -45,17 +49,24 @@ pub fn init() -> VM {
 pub fn load_rom(path: String, vm: &mut VM) -> Result<(), std::io::Error> {
     let content = std::fs::read(path)?;
     for i in 0..content.len() {
-        vm.memory[PROGRAM_START + i] = content[i]
+        vm.memory[PROGRAM_START + i] = content[i];
     }
 
     Ok(())
 }
 
 fn opcode_to_instruction(opcode: u16) -> Instruction {
-    match opcode {
-        0x00E0 => Instruction::CLS(ClearScreen {}),
-        0x1___ => Instruction::JMP(Jump {
+    match opcode & 0xF000 {
+        0x0000 => match opcode {
+            0x00E0 => Instruction::CLS(ClearScreen {}),
+            _ => Instruction::UNK(Unknown { opcode }),
+        },
+        0x1000 => Instruction::JMP(Jump {
             address: opcode & 0x0FFF,
+        }),
+        0x6000 => Instruction::LDV(LoadValue { 
+            register: ((opcode & 0x0F00) >> 8) as usize,
+             value: (opcode & 0x00FF) as u8
         }),
         _ => Instruction::UNK(Unknown { opcode }),
     }
@@ -67,5 +78,7 @@ pub fn get_current_instruction(vm: &mut VM) -> Instruction {
 
     vm.program_counter += 2;
 
-    opcode_to_instruction((b1 << 8) | b2)
+    let opcode = (b1 << 8) | b2;
+    println!("{:04X}", opcode);
+    opcode_to_instruction(opcode)
 }

@@ -1,5 +1,5 @@
 use raylib::prelude::*;
-use std::error::Error;
+use std::{error::Error, process::exit};
 
 mod instructions;
 use instructions::*;
@@ -15,13 +15,15 @@ fn fetch_decode_execute(vm: &mut VM) {
     let instruction = vm::get_current_instruction(vm);
 
     println!("{}", instruction.disassemble());
+    match instruction {
+        Instruction::UNK(i) => exit(1),
+        _ => /* Nothing */(),
+    };
+
     instruction.execute(vm);
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    // 1. Boot: Init memory, init PC, init registers...
-    // 2. Load Rom into Memory
-    // 2. Start the fetch_decode_execute cycle
     let mut vm = vm::init();
     let mut raylib_context = screen::init();
 

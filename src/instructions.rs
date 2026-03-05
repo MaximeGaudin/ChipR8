@@ -1,4 +1,3 @@
-
 use crate::VM;
 
 // 0nnn - SYS addr
@@ -36,7 +35,7 @@ impl ClearScreen {
     }
 
     fn execute(&self, vm: &mut VM) {
-        vm.memory.fill(0);
+        vm.screen.fill(0);
     }
 }
 
@@ -82,6 +81,29 @@ impl Jump {
     }
 }
 
+// 1nnn
+pub struct LoadValue {
+    pub register: usize,
+    pub value: u8,
+}
+
+impl LoadValue {
+    fn disassemble(&self) -> String {
+        format!("LD V{:1X}, {:02X}", self.register, self.value)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec![
+            "Set Vx = kk.",
+            "The interpreter puts the value kk into register Vx.",
+        ]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        vm.registers[self.register] = self.value;
+    }
+}
+
 pub struct Unknown {
     pub opcode: u16,
 }
@@ -103,6 +125,7 @@ pub enum Instruction {
     JMP(Jump),
     CLS(ClearScreen),
     UNK(Unknown),
+    LDV(LoadValue),
 }
 
 impl Instruction {
@@ -110,6 +133,8 @@ impl Instruction {
         match self {
             Instruction::JMP(i) => i.disassemble(),
             Instruction::CLS(i) => i.disassemble(),
+            Instruction::LDV(i) => i.disassemble(),
+
             Instruction::UNK(i) => i.disassemble(),
         }
     }
@@ -118,6 +143,8 @@ impl Instruction {
         match self {
             Instruction::JMP(i) => i.execute(vm),
             Instruction::CLS(i) => i.execute(vm),
+            Instruction::LDV(i) => i.execute(vm),
+
             Instruction::UNK(i) => i.execute(vm),
         }
     }
