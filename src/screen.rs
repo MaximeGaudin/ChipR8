@@ -1,11 +1,13 @@
 use raylib::prelude::*;
 
-use crate::vm::VM;
+use crate::vm::{self, VM};
 
 static SCALE: i32 = 15;
 static WIDTH: i32 = 64 * SCALE;
 static HEIGHT: i32 = 32 * SCALE;
+
 static BACKGROUND_COLOR : Color = Color::WHITE;
+static PIXEL_COLOR : Color = Color::BLACK;
 
 pub struct RaylibContext {
     pub handle: RaylibHandle,
@@ -28,5 +30,19 @@ pub fn render(vm: &mut VM, context: &mut RaylibContext) {
 
     d.clear_background(BACKGROUND_COLOR);
 
-    // TODO: Render active pixels
+    for y in 0..vm::SCREEN_HEIGHT {
+        for x in 0..vm::SCREEN_WIDTH {
+            let screen_index = x + (y * vm::SCREEN_WIDTH);
+
+            if vm.screen[screen_index] == 1 {
+                d.draw_rectangle(
+                    (x as i32) * SCALE,
+                    (y as i32) * SCALE,
+                    SCALE,
+                    SCALE,
+                    PIXEL_COLOR, 
+                );
+            }
+        }
+    }
 }

@@ -62,6 +62,6 @@ pub fn get_current_instruction(vm: &mut VM) -> Instruction {
     vm.program_counter += 2;
 
     let opcode = (b1 << 8) | b2;
-    println!("{:04X}", opcode);
+    // println!("{:04X}", opcode);
     opcode_to_instruction(opcode)
 }

@@ -165,7 +165,7 @@ impl Draw {
                     let screen_x = (start_x + column) % vm::SCREEN_WIDTH;
                     let screen_y = (start_y + row) % vm::SCREEN_HEIGHT;
 
-                    let screen_index = screen_x + (screen_y * vm::SCREEN_HEIGHT);
+                    let screen_index = screen_x + (screen_y * vm::SCREEN_WIDTH);
 
                     // If collision, update the F register
                     if vm.screen[screen_index] == 1 {
