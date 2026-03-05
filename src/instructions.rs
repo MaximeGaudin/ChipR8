@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use crate::{VM, vm};
 
 // 0nnn - SYS addr
@@ -123,6 +125,29 @@ impl LoadI {
     }
 }
 
+// 7xkk
+pub struct AddValue {
+    pub register: usize,
+    pub value: u8,
+}
+
+impl AddValue {
+    fn disassemble(&self) -> String {
+        format!("ADD V{:1X}, {:2X}", self.register, self.value)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec![
+            "Set Vx = Vx + kk.",
+            "Adds the value kk to the value of register Vx, then stores the result in Vx.",
+        ]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        vm.registers[self.register] = vm.registers[self.register] + self.value;
+    }
+}
+
 // Dxyn
 pub struct Draw {
     pub register_x: usize,
@@ -176,7 +201,7 @@ impl Draw {
                     vm.screen[screen_index] ^= 1;
                 }
             }
-        } 
+        }
     }
 }
 
@@ -204,6 +229,7 @@ pub enum Instruction {
     LDV(LoadValue),
     LDI(LoadI),
     DRW(Draw),
+    ADV(AddValue),
 }
 
 impl Instruction {
@@ -214,6 +240,7 @@ impl Instruction {
             Instruction::LDV(i) => i.disassemble(),
             Instruction::LDI(i) => i.disassemble(),
             Instruction::DRW(i) => i.disassemble(),
+            Instruction::ADV(i) => i.disassemble(),
 
             Instruction::UNK(i) => i.disassemble(),
         }
@@ -226,6 +253,7 @@ impl Instruction {
             Instruction::LDV(i) => i.execute(vm),
             Instruction::LDI(i) => i.execute(vm),
             Instruction::DRW(i) => i.execute(vm),
+            Instruction::ADV(i) => i.execute(vm),
 
             Instruction::UNK(i) => i.execute(vm),
         }
@@ -245,13 +273,17 @@ pub fn opcode_to_instruction(opcode: u16) -> Instruction {
             register: ((opcode & 0x0F00) >> 8) as usize,
             value: (opcode & 0x00FF) as u8,
         }),
+        0x7000 => Instruction::ADV(AddValue {
+            register: ((opcode & 0x0F00) >> 8) as usize,
+            value: (opcode & 0x00FF) as u8,
+        }),
         0xA000 => Instruction::LDI(LoadI {
             value: (opcode & 0x0FFF) as usize,
         }),
         0xD000 => Instruction::DRW(Draw {
             register_x: ((opcode & 0x0F00) >> 8) as usize,
             register_y: ((opcode & 0x00F0) >> 4) as usize,
-            n_bytes: ((opcode & 0x000F)) as usize,
+            n_bytes: (opcode & 0x000F) as usize,
         }),
 
         _ => Instruction::UNK(Unknown { opcode }),
