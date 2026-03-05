@@ -81,7 +81,7 @@ impl Jump {
     }
 }
 
-// 1nnn
+// 6kkk
 pub struct LoadValue {
     pub register: usize,
     pub value: u8,
@@ -89,7 +89,7 @@ pub struct LoadValue {
 
 impl LoadValue {
     fn disassemble(&self) -> String {
-        format!("LD V{:1X}, {:02X}", self.register, self.value)
+        format!("LD V{:1X}, {:2X}", self.register, self.value)
     }
 
     fn documentation(&self) -> Vec<&str> {
@@ -101,6 +101,28 @@ impl LoadValue {
 
     fn execute(&self, vm: &mut VM) {
         vm.registers[self.register] = self.value;
+    }
+}
+
+// Annn
+pub struct LoadI {
+    pub value: u16,
+}
+
+impl LoadI {
+    fn disassemble(&self) -> String {
+        format!("LD I, {:03X}", self.value)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec![
+            "Set I = nnn.",
+            "The value of register I is set to nnn.",
+        ]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        vm.i = self.value;
     }
 }
 
@@ -126,6 +148,7 @@ pub enum Instruction {
     CLS(ClearScreen),
     UNK(Unknown),
     LDV(LoadValue),
+    LDI(LoadI),
 }
 
 impl Instruction {
@@ -134,6 +157,7 @@ impl Instruction {
             Instruction::JMP(i) => i.disassemble(),
             Instruction::CLS(i) => i.disassemble(),
             Instruction::LDV(i) => i.disassemble(),
+            Instruction::LDI(i) => i.disassemble(),
 
             Instruction::UNK(i) => i.disassemble(),
         }
@@ -144,8 +168,30 @@ impl Instruction {
             Instruction::JMP(i) => i.execute(vm),
             Instruction::CLS(i) => i.execute(vm),
             Instruction::LDV(i) => i.execute(vm),
+            Instruction::LDI(i) => i.execute(vm),
 
             Instruction::UNK(i) => i.execute(vm),
         }
+    }
+}
+
+pub fn opcode_to_instruction(opcode: u16) -> Instruction {
+    match opcode & 0xF000 {
+        0x0000 => match opcode {
+            0x00E0 => Instruction::CLS(ClearScreen {}),
+            _ => Instruction::UNK(Unknown { opcode }),
+        },
+        0x1000 => Instruction::JMP(Jump {
+            address: opcode & 0x0FFF,
+        }),
+        0x6000 => Instruction::LDV(LoadValue { 
+            register: ((opcode & 0x0F00) >> 8) as usize,
+             value: (opcode & 0x00FF) as u8
+        }),
+        0xA000 => Instruction::LDI(LoadI { 
+             value: (opcode & 0x0FFF) as u16
+        }),
+
+        _ => Instruction::UNK(Unknown { opcode }),
     }
 }

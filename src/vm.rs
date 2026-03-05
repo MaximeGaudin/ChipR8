@@ -55,23 +55,6 @@ pub fn load_rom(path: String, vm: &mut VM) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn opcode_to_instruction(opcode: u16) -> Instruction {
-    match opcode & 0xF000 {
-        0x0000 => match opcode {
-            0x00E0 => Instruction::CLS(ClearScreen {}),
-            _ => Instruction::UNK(Unknown { opcode }),
-        },
-        0x1000 => Instruction::JMP(Jump {
-            address: opcode & 0x0FFF,
-        }),
-        0x6000 => Instruction::LDV(LoadValue { 
-            register: ((opcode & 0x0F00) >> 8) as usize,
-             value: (opcode & 0x00FF) as u8
-        }),
-        _ => Instruction::UNK(Unknown { opcode }),
-    }
-}
-
 pub fn get_current_instruction(vm: &mut VM) -> Instruction {
     let b1 = vm.memory[vm.program_counter] as u16;
     let b2 = vm.memory[vm.program_counter + 1] as u16;
