@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut vm = vm::init();
     let mut raylib_context = screen::init();
 
-    vm::load_rom("roms/ibm-logo.ch8".to_string(), &mut vm).unwrap();
+    vm::load_rom("roms/corax+.ch8".to_string(), &mut vm).unwrap();
 
     // Boucle principale
     while !raylib_context.handle.window_should_close() {

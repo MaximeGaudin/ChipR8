@@ -2,27 +2,6 @@ use std::ops::Add;
 
 use crate::{VM, vm};
 
-// 0nnn - SYS addr
-pub struct JumpSys {
-    address: u16,
-}
-
-impl JumpSys {
-    fn disassemble(&self) -> String {
-        format!("SYS {:03X}", self.address)
-    }
-
-    fn documentation(&self) -> Vec<&str> {
-        vec![
-            "Jump to a machine code routine at nnn.",
-            "This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters.",
-        ]
-    }
-
-    fn execute(&self, vm: &mut VM) {
-        /* IGNORED */
-    }
-}
 
 // 00E0 - CLS
 pub struct ClearScreen {}
@@ -80,6 +59,57 @@ impl Jump {
 
     fn execute(&self, vm: &mut VM) {
         vm.program_counter = self.address;
+    }
+}
+
+
+// 3xkk
+pub struct SkipIfValue {
+    pub register: usize,
+    pub value: u8,
+}
+
+impl SkipIfValue {
+    fn disassemble(&self) -> String {
+        format!("SE V{:1X}, {:2X}", self.register, self.value)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec![
+            "Skip next instruction if Vx = kk.",
+            "The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.",
+        ]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        if vm.registers[self.register] == self.value {
+            vm.program_counter += 2
+        }
+    }
+}
+
+// 4xkk
+pub struct SkipIfNotValue {
+    pub register: usize,
+    pub value: u8,
+}
+
+impl SkipIfNotValue {
+    fn disassemble(&self) -> String {
+        format!("SNE V{:1X}, {:2X}", self.register, self.value)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec![
+            "Skip next instruction if Vx = kk.",
+            "The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.",
+        ]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        if vm.registers[self.register] != self.value {
+            vm.program_counter += 2
+        }
     }
 }
 
@@ -230,6 +260,8 @@ pub enum Instruction {
     LDI(LoadI),
     DRW(Draw),
     ADV(AddValue),
+    SEV(SkipIfValue),
+    SENV(SkipIfNotValue),
 }
 
 impl Instruction {
@@ -241,6 +273,8 @@ impl Instruction {
             Instruction::LDI(i) => i.disassemble(),
             Instruction::DRW(i) => i.disassemble(),
             Instruction::ADV(i) => i.disassemble(),
+            Instruction::SEV(i) => i.disassemble(),
+            Instruction::SENV(i) => i.disassemble(),
 
             Instruction::UNK(i) => i.disassemble(),
         }
@@ -254,6 +288,8 @@ impl Instruction {
             Instruction::LDI(i) => i.execute(vm),
             Instruction::DRW(i) => i.execute(vm),
             Instruction::ADV(i) => i.execute(vm),
+            Instruction::SEV(i) => i.execute(vm),
+            Instruction::SENV(i) => i.execute(vm),
 
             Instruction::UNK(i) => i.execute(vm),
         }
@@ -268,6 +304,14 @@ pub fn opcode_to_instruction(opcode: u16) -> Instruction {
         },
         0x1000 => Instruction::JMP(Jump {
             address: (opcode & 0x0FFF) as usize,
+        }),
+        0x3000 => Instruction::SEV(SkipIfValue {
+            register: ((opcode & 0x0F00) >> 8) as usize,
+            value: (opcode & 0x00FF) as u8,
+        }),
+        0x4000 => Instruction::SENV(SkipIfNotValue {
+            register: ((opcode & 0x0F00) >> 8) as usize,
+            value: (opcode & 0x00FF) as u8,
         }),
         0x6000 => Instruction::LDV(LoadValue {
             register: ((opcode & 0x0F00) >> 8) as usize,
