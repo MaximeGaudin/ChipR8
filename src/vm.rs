@@ -1,7 +1,7 @@
 use crate::instructions::*;
 
-const SCREEN_WIDTH: usize = 64;
-const SCREEN_HEIGHT: usize = 32;
+pub const SCREEN_WIDTH: usize = 64;
+pub const SCREEN_HEIGHT: usize = 32;
 const FONT_SET: [u8; 80] = [
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -26,7 +26,7 @@ pub struct VM {
     pub memory: [u8; 4096],
     pub screen: [u8; SCREEN_WIDTH * SCREEN_HEIGHT],
     pub registers: [u8; 16],
-    pub i: u16,
+    pub i: usize,
     pub program_counter: usize,
 }
 
