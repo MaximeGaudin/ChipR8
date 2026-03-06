@@ -1,4 +1,4 @@
-use crate::{vm::VM, instructions::base::Instruction};
+use crate::{instructions::base::Instruction, vm::VM};
 
 pub(super) struct Jump {
     pub address: usize,
@@ -16,4 +16,3 @@ impl Instruction for Jump {
         vm.program_counter = self.address;
     }
 }
-

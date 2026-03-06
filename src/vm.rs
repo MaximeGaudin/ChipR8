@@ -55,7 +55,7 @@ pub fn init(mode: EmulationMode) -> VM {
         program_counter: PROGRAM_START,
         stack_pointer: 0,
 
-        mode: mode
+        mode: mode,
     };
 
     for i in 0..FONT_SET.len() {

@@ -3,8 +3,8 @@ use std::error::Error;
 mod instructions;
 use instructions::base::Instruction;
 
-mod vm;
 mod screen;
+mod vm;
 
 fn fetch_decode_execute(vm: &mut vm::VM) {
     let instruction = vm::get_current_instruction(vm);
