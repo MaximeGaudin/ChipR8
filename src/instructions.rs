@@ -40,8 +40,8 @@ impl Return {
             panic!("Stack Underflow");
         }
 
-        vm.program_counter = vm.stack[vm.stack_pointer] as usize;
         vm.stack_pointer -= 1;
+        vm.program_counter = vm.stack[vm.stack_pointer] as usize;
     }
 }
 
