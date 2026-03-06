@@ -9,10 +9,9 @@ mod vm;
 fn fetch_decode_execute(vm: &mut vm::VM) {
     let instruction = vm::get_current_instruction(vm);
 
-    // println!("{}", instruction.disassemble());
 
     if instruction.is_unknown() {
-        panic!("NOT IMPLEMENTED")
+        panic!("{}", instruction.disassemble())
     }
 
     instruction.execute(vm);
@@ -38,6 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
 
         screen::render(&mut vm, &mut raylib_context);
+        vm::update_timer(&mut vm);
     }
 
     Ok(())

@@ -9,6 +9,8 @@ use crate::instructions::arithmetic::ShiftRightRegisterToRegister;
 use crate::instructions::arithmetic::SubRegisterToRegister;
 use crate::instructions::arithmetic::SubReverseRegisterToRegister;
 use crate::instructions::arithmetic::Xor;
+use crate::instructions::keyboard::SkipIfKeyNotPressed;
+use crate::instructions::keyboard::SkipIfKeyPressed;
 use crate::instructions::memory::LoadBCD;
 use crate::instructions::memory::LoadMemoryIntoRegisters;
 use crate::instructions::memory::LoadRandomIntoRegister;
@@ -19,6 +21,9 @@ use crate::instructions::other::*;
 use crate::instructions::screen::*;
 use crate::instructions::skip::*;
 use crate::instructions::subroutines::*;
+use crate::instructions::timers::LoadDelayTimerIntoRegister;
+use crate::instructions::timers::SetDelayTimer;
+use crate::instructions::timers::SetSoundTimer;
 use crate::vm::VM;
 
 pub trait Instruction {
@@ -135,7 +140,25 @@ pub fn opcode_to_instruction(opcode: u16) -> Box<dyn Instruction> {
             register_y: ((opcode & 0x00F0) >> 4) as usize,
             n_bytes: (opcode & 0x000F) as usize,
         }),
+        0xE000 => match opcode & 0x00FF {
+            0x009E => Box::new(SkipIfKeyPressed {
+                register: ((opcode & 0x0F00) >> 8) as usize,
+            }),
+            0x00A1 => Box::new(SkipIfKeyNotPressed {
+                register: ((opcode & 0x0F00) >> 8) as usize,
+            }),
+            _ => Box::new(Invalid { opcode }),
+        },
         0xF000 => match opcode & 0x00FF {
+            0x0007 => Box::new(LoadDelayTimerIntoRegister {
+                register: ((opcode & 0x0F00) >> 8) as usize,
+            }),
+            0x0015 => Box::new(SetDelayTimer {
+                register: ((opcode & 0x0F00) >> 8) as usize,
+            }),
+            0x0018 => Box::new(SetSoundTimer {
+                register: ((opcode & 0x0F00) >> 8) as usize,
+            }),
             0x0055 => Box::new(LoadRegistersIntoMemory {
                 register: ((opcode & 0x0F00) >> 8) as usize,
             }),

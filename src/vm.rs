@@ -41,6 +41,9 @@ pub struct VM {
     pub program_counter: usize,
     pub stack_pointer: usize,
 
+    pub delay_timer_register: u8,
+    pub sound_timer_register: u8,
+
     pub mode: EmulationMode,
 }
 
@@ -54,6 +57,9 @@ pub fn init(mode: EmulationMode) -> VM {
         i: 0,
         program_counter: PROGRAM_START,
         stack_pointer: 0,
+
+        delay_timer_register: 0,
+        sound_timer_register: 0,
 
         mode: mode,
     };
@@ -83,4 +89,14 @@ pub fn get_current_instruction(vm: &mut VM) -> Box<dyn Instruction> {
     let opcode = (b1 << 8) | b2;
     // println!("{:04X}", opcode);
     opcode_to_instruction(opcode)
+}
+
+pub fn update_timer(vm: &mut VM) {
+    if vm.delay_timer_register > 0 {
+        vm.delay_timer_register -= 1;
+    }
+
+    if vm.sound_timer_register > 0 {
+        vm.sound_timer_register -= 1;
+    }
 }

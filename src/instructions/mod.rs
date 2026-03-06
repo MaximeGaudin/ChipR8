@@ -6,3 +6,5 @@ mod other;
 mod screen;
 mod skip;
 mod subroutines;
+mod timers;
+mod keyboard;
