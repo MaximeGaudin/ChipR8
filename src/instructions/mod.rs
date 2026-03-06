@@ -1,7 +1,7 @@
 pub mod base;
 
-mod other;
 mod arithmetic;
-mod subroutines;
+mod other;
 mod screen;
 mod skip;
+mod subroutines;

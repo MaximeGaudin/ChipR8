@@ -1,16 +1,16 @@
-use crate::vm::VM;
+use crate::{instructions::base::Instruction, vm::VM};
 
-pub struct Return {}
+pub(super) struct Return {}
 
-impl Return {
-    pub(super) fn disassemble(&self) -> String {
+impl Instruction for Return {
+    fn disassemble(&self) -> String {
         "RET".to_string()
     }
 
     // 00E0
     // Return from a subroutine.
     // The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
-    pub(super) fn execute(&self, vm: &mut VM) {
+    fn execute(&self, vm: &mut VM) {
         if vm.stack_pointer == 0 {
             panic!("Stack Underflow");
         }
@@ -24,16 +24,16 @@ pub(super) struct Call {
     pub address: usize,
 }
 
-impl Call {
-    pub(super) fn disassemble(&self) -> String {
+impl Instruction for Call {
+    fn disassemble(&self) -> String {
         format!("CALL {:03X}", self.address)
     }
 
     // 2nnn
     // Call subroutine at nnn.
-    // The interpreter increments the stack pointer, then puts the current PC on the top of the stack. 
+    // The interpreter increments the stack pointer, then puts the current PC on the top of the stack.
     // The PC is then set to nnn."
-    pub(super) fn execute(&self, vm: &mut VM) {
+    fn execute(&self, vm: &mut VM) {
         if vm.stack_pointer >= vm.stack.len() {
             panic!("Stack Overflow")
         }

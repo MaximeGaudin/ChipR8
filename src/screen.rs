@@ -6,8 +6,8 @@ static SCALE: i32 = 15;
 static WIDTH: i32 = 64 * SCALE;
 static HEIGHT: i32 = 32 * SCALE;
 
-static BACKGROUND_COLOR : Color = Color::WHITE;
-static PIXEL_COLOR : Color = Color::BLACK;
+static BACKGROUND_COLOR: Color = Color::WHITE;
+static PIXEL_COLOR: Color = Color::BLACK;
 
 pub struct RaylibContext {
     pub handle: RaylibHandle,
@@ -15,10 +15,7 @@ pub struct RaylibContext {
 }
 
 pub fn init() -> RaylibContext {
-    let (mut rl, thread) = raylib::init()
-        .size(WIDTH, HEIGHT)
-        .title("Chip R8")
-        .build();
+    let (mut rl, thread) = raylib::init().size(WIDTH, HEIGHT).title("Chip R8").build();
 
     rl.set_target_fps(60);
 
@@ -40,7 +37,7 @@ pub fn render(vm: &mut VM, context: &mut RaylibContext) {
                     (y as i32) * SCALE,
                     SCALE,
                     SCALE,
-                    PIXEL_COLOR, 
+                    PIXEL_COLOR,
                 );
             }
         }

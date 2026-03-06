@@ -62,7 +62,7 @@ pub fn load_rom(path: String, vm: &mut VM) -> Result<(), std::io::Error> {
     Ok(())
 }
 
-pub fn get_current_instruction(vm: &mut VM) -> Instruction {
+pub fn get_current_instruction(vm: &mut VM) -> Box<dyn Instruction> {
     let b1 = vm.memory[vm.program_counter] as u16;
     let b2 = vm.memory[vm.program_counter + 1] as u16;
 
