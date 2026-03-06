@@ -92,7 +92,14 @@ impl Instruction for LoadBCD {
     }
 
     fn execute(&self, vm: &mut VM) {
-        // TODO
+        let value = vm.registers[self.register];
+        let hundreds = value / 100;
+        let tens = (value / 10) % 10;
+        let units = value % 10;
+
+        vm.memory[vm.i] = hundreds;
+        vm.memory[vm.i + 1] = tens;
+        vm.memory[vm.i + 2] = units;
     }
 }
 
