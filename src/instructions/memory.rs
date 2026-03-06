@@ -62,7 +62,7 @@ impl Instruction for LoadRegistersIntoMemory {
     }
 
     fn execute(&self, vm: &mut VM) {
-        for j in 0..self.register {
+        for j in 0..=self.register {
             vm.memory[vm.i + j] = vm.registers[j];
         }
     }
@@ -77,7 +77,7 @@ impl Instruction for LoadMemoryIntoRegisters {
     }
 
     fn execute(&self, vm: &mut VM) {
-        for j in 0..self.register {
+        for j in 0..=self.register {
             vm.registers[j] = vm.memory[vm.i + j];
         }
     }
