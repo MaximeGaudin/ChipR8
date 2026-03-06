@@ -22,6 +22,7 @@ const FONT_SET: [u8; 80] = [
     0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
 const PROGRAM_START: usize = 0x200;
+pub const CPU_TICK_RATE: u32 = 1000;
 
 #[derive(PartialEq, Debug)]
 pub enum EmulationMode {

@@ -9,6 +9,8 @@ static HEIGHT: i32 = 32 * SCALE;
 static BACKGROUND_COLOR: Color = Color::WHITE;
 static PIXEL_COLOR: Color = Color::BLACK;
 
+pub static FRAME_RATE: u32 = 60;
+
 pub struct RaylibContext {
     pub handle: RaylibHandle,
     pub thread: RaylibThread,
@@ -17,7 +19,7 @@ pub struct RaylibContext {
 pub fn init() -> RaylibContext {
     let (mut rl, thread) = raylib::init().size(WIDTH, HEIGHT).title("Chip R8").build();
 
-    rl.set_target_fps(60);
+    rl.set_target_fps(FRAME_RATE);
 
     RaylibContext { handle: rl, thread }
 }

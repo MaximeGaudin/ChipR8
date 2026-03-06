@@ -1,4 +1,4 @@
-use std::mem;
+use rand::{Rng, rng};
 
 use crate::{instructions::base::Instruction, vm::VM};
 
@@ -21,6 +21,11 @@ pub(super) struct LoadMemoryIntoRegisters {
 
 pub(super) struct LoadBCD {
     pub register: usize,
+}
+
+pub(super) struct LoadRandomIntoRegister {
+    pub register: usize,
+    pub mask: u8,
 }
 
 // 6kkk
@@ -88,5 +93,21 @@ impl Instruction for LoadBCD {
 
     fn execute(&self, vm: &mut VM) {
         // TODO
+    }
+}
+
+// Cxkk - RND Vx, byte
+// Set Vx = random byte AND kk.
+// The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk. 
+// The results are stored in Vx.
+//  See instruction 8xy2 for more information on AND.
+impl Instruction for LoadRandomIntoRegister {
+    fn execute(&self, vm: &mut VM) {
+        let random_byte: u8 = rand::random();
+        vm.registers[self.register] = random_byte & self.mask;
+    }
+
+    fn disassemble(&self) -> String {
+        format!("RND V{:1X}, {:2X}", self.register, self.mask)
     }
 }

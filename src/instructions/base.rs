@@ -11,6 +11,7 @@ use crate::instructions::arithmetic::SubReverseRegisterToRegister;
 use crate::instructions::arithmetic::Xor;
 use crate::instructions::memory::LoadBCD;
 use crate::instructions::memory::LoadMemoryIntoRegisters;
+use crate::instructions::memory::LoadRandomIntoRegister;
 use crate::instructions::memory::LoadRegistersIntoMemory;
 use crate::instructions::memory::LoadValueToI;
 use crate::instructions::memory::LoadValueToRegister;
@@ -124,6 +125,10 @@ pub fn opcode_to_instruction(opcode: u16) -> Box<dyn Instruction> {
         }),
         0xA000 => Box::new(LoadValueToI {
             value: (opcode & 0x0FFF) as usize,
+        }),
+        0xC000 => Box::new(LoadRandomIntoRegister {
+            register: ((opcode & 0x0F00) >> 8) as usize,
+            mask: (opcode & 0x00FF) as u8,
         }),
         0xD000 => Box::new(Draw {
             register_x: ((opcode & 0x0F00) >> 8) as usize,
