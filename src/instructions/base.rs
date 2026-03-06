@@ -62,11 +62,12 @@ impl Instruction {
 
     pub fn execute(&self, vm: &mut VM) {
         match self {
-            Instruction::JMP(i) => i.execute(vm),
             Instruction::CLS(i) => i.execute(vm),
+            Instruction::DRW(i) => i.execute(vm),
+
+            Instruction::JMP(i) => i.execute(vm),
             Instruction::LDV(i) => i.execute(vm),
             Instruction::LDI(i) => i.execute(vm),
-            Instruction::DRW(i) => i.execute(vm),
             Instruction::ADV(i) => i.execute(vm),
             Instruction::SEV(i) => i.execute(vm),
             Instruction::SER(i) => i.execute(vm),
