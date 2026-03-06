@@ -5,3 +5,4 @@ mod other;
 mod screen;
 mod skip;
 mod subroutines;
+mod memory;

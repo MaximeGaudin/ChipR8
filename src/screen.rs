@@ -1,6 +1,6 @@
 use raylib::prelude::*;
 
-use crate::vm::{self, VM};
+use crate::vm::{self, SCREEN_WIDTH, VM};
 
 static SCALE: i32 = 15;
 static WIDTH: i32 = 64 * SCALE;
@@ -42,4 +42,6 @@ pub fn render(vm: &mut VM, context: &mut RaylibContext) {
             }
         }
     }
+
+    d.draw_fps((SCREEN_WIDTH as i32) * SCALE - 90, 10);
 }

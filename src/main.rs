@@ -19,7 +19,7 @@ fn fetch_decode_execute(vm: &mut vm::VM) {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut vm = vm::init();
+    let mut vm = vm::init(vm::EmulationMode::Chip8);
     let mut raylib_context = screen::init();
 
     vm::load_rom("roms/corax+.ch8".to_string(), &mut vm).unwrap();

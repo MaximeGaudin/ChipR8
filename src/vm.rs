@@ -23,6 +23,13 @@ const FONT_SET: [u8; 80] = [
 ];
 const PROGRAM_START: usize = 0x200;
 
+#[derive(PartialEq, Debug)]
+pub enum EmulationMode {
+    Chip8,
+    SuperChip,
+    XoChip,
+}
+
 pub struct VM {
     pub screen: [u8; SCREEN_WIDTH * SCREEN_HEIGHT],
     pub memory: [u8; 4096],
@@ -32,9 +39,11 @@ pub struct VM {
     pub i: usize,
     pub program_counter: usize,
     pub stack_pointer: usize,
+
+    pub mode: EmulationMode,
 }
 
-pub fn init() -> VM {
+pub fn init(mode: EmulationMode) -> VM {
     let mut vm = VM {
         screen: [0; SCREEN_WIDTH * SCREEN_HEIGHT],
         memory: [0; 4096],
@@ -44,6 +53,8 @@ pub fn init() -> VM {
         i: 0,
         program_counter: PROGRAM_START,
         stack_pointer: 0,
+
+        mode: mode
     };
 
     for i in 0..FONT_SET.len() {
