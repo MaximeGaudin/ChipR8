@@ -36,7 +36,12 @@ impl Return {
     }
 
     fn execute(&self, vm: &mut VM) {
-        panic!("NOT IMPLEMENTED")
+        if vm.stack_pointer == 0 {
+            panic!("Stack Underflow");
+        }
+
+        vm.program_counter = vm.stack[vm.stack_pointer] as usize;
+        vm.stack_pointer -= 1;
     }
 }
 
@@ -62,6 +67,34 @@ impl Jump {
     }
 }
 
+
+// 2nnn
+pub struct Call {
+    pub address: usize,
+}
+
+impl Call {
+    fn disassemble(&self) -> String {
+        format!("CALL {:03X}", self.address)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec![
+            "Call subroutine at nnn.",
+            "TThe interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.",
+        ]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        if vm.stack_pointer >= vm.stack.len() {
+            panic!("Stack Overflow")
+        }
+
+        vm.stack[vm.stack_pointer] = vm.program_counter as u16;
+        vm.stack_pointer += 1;
+        vm.program_counter = self.address;
+    }
+}
 
 // 3xkk
 pub struct SkipIfValue {
@@ -319,6 +352,9 @@ pub enum Instruction {
     SENV(SkipIfNotValue),
     SER(SkipIfRegister),
     SENR(SkipIfNotRegister),
+
+    CALL(Call),
+    RET(Return),
 }
 
 impl Instruction {
@@ -334,6 +370,8 @@ impl Instruction {
             Instruction::SER(i) => i.disassemble(),
             Instruction::SENV(i) => i.disassemble(),
             Instruction::SENR(i) => i.disassemble(),
+            Instruction::CALL(i) => i.disassemble(),
+            Instruction::RET(i) => i.disassemble(),
 
             Instruction::UNK(i) => i.disassemble(),
         }
@@ -351,6 +389,8 @@ impl Instruction {
             Instruction::SER(i) => i.execute(vm),
             Instruction::SENV(i) => i.execute(vm),
             Instruction::SENR(i) => i.execute(vm),
+            Instruction::CALL(i) => i.execute(vm),
+            Instruction::RET(i) => i.execute(vm),
 
             Instruction::UNK(i) => i.execute(vm),
         }
@@ -361,9 +401,13 @@ pub fn opcode_to_instruction(opcode: u16) -> Instruction {
     match opcode & 0xF000 {
         0x0000 => match opcode {
             0x00E0 => Instruction::CLS(ClearScreen {}),
+            0x00EE => Instruction::RET(Return {}),
             _ => Instruction::UNK(Unknown { opcode }),
         },
         0x1000 => Instruction::JMP(Jump {
+            address: (opcode & 0x0FFF) as usize,
+        }),
+        0x2000 => Instruction::CALL(Call {
             address: (opcode & 0x0FFF) as usize,
         }),
         0x3000 => Instruction::SEV(SkipIfValue {

@@ -23,20 +23,26 @@ const FONT_SET: [u8; 80] = [
 const PROGRAM_START: usize = 0x200;
 
 pub struct VM {
-    pub memory: [u8; 4096],
     pub screen: [u8; SCREEN_WIDTH * SCREEN_HEIGHT],
+    pub memory: [u8; 4096],
     pub registers: [u8; 16],
+    pub stack: [u16; 16],
+
     pub i: usize,
     pub program_counter: usize,
+    pub stack_pointer: usize,
 }
 
 pub fn init() -> VM {
     let mut vm = VM {
-        memory: [0; 4096],
         screen: [0; SCREEN_WIDTH * SCREEN_HEIGHT],
+        memory: [0; 4096],
         registers: [0; 16],
+        stack: [0; 16],
+
         i: 0,
         program_counter: PROGRAM_START,
+        stack_pointer: 0,
     };
 
     for i in 0..FONT_SET.len() {
