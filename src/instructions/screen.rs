@@ -1,6 +1,4 @@
-use crate::Instruction;
-use crate::vm;
-use crate::vm::VM;
+use crate::{Instruction, vm, vm::VM};
 
 pub(super) struct ClearScreen {}
 

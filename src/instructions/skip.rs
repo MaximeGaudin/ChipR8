@@ -1,5 +1,4 @@
-use super::base::Instruction;
-use crate::vm::VM;
+use crate::{Instruction, vm::VM};
 
 pub(super) struct SkipIfValue {
     pub register: usize,

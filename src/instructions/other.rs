@@ -1,4 +1,4 @@
-use crate::{VM, instructions::base::Instruction, vm};
+use crate::{vm::VM, instructions::base::Instruction};
 
 pub(super) struct Jump {
     pub address: usize,

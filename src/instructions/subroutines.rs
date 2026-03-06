@@ -2,6 +2,10 @@ use crate::{instructions::base::Instruction, vm::VM};
 
 pub(super) struct Return {}
 
+pub(super) struct Call {
+    pub address: usize,
+}
+
 impl Instruction for Return {
     fn disassemble(&self) -> String {
         "RET".to_string()
@@ -18,10 +22,6 @@ impl Instruction for Return {
         vm.stack_pointer -= 1;
         vm.program_counter = vm.stack[vm.stack_pointer] as usize;
     }
-}
-
-pub(super) struct Call {
-    pub address: usize,
 }
 
 impl Instruction for Call {

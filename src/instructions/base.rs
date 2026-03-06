@@ -4,6 +4,14 @@ use crate::instructions::skip::*;
 use crate::instructions::subroutines::*;
 use crate::vm::VM;
 
+pub trait Instruction {
+    fn execute(&self, vm: &mut VM);
+    fn disassemble(&self) -> String;
+    fn is_unknown(&self) -> bool {
+        false
+    }
+}
+
 pub(super) struct Unknown {
     pub opcode: u16,
 }
@@ -13,20 +21,12 @@ impl Instruction for Unknown {
         format!("UNKNOWN: {:04X}", self.opcode)
     }
 
-    fn execute(&self, vm: &mut VM) {
+    fn execute(&self, _vm: &mut VM) {
         // Nothing to do
     }
 
     fn is_unknown(&self) -> bool {
         true
-    }
-}
-
-pub trait Instruction {
-    fn execute(&self, vm: &mut VM);
-    fn disassemble(&self) -> String;
-    fn is_unknown(&self) -> bool {
-        false
     }
 }
 

@@ -4,13 +4,9 @@ mod instructions;
 use instructions::base::Instruction;
 
 mod vm;
-use vm::VM;
-
 mod screen;
 
-mod tests;
-
-fn fetch_decode_execute(vm: &mut VM) {
+fn fetch_decode_execute(vm: &mut vm::VM) {
     let instruction = vm::get_current_instruction(vm);
 
     println!("{}", instruction.disassemble());
@@ -26,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut vm = vm::init();
     let mut raylib_context = screen::init();
 
-    vm::load_rom("roms/ibm-logo.ch8".to_string(), &mut vm).unwrap();
+    vm::load_rom("roms/corax+.ch8".to_string(), &mut vm).unwrap();
 
     // Boucle principale
     while !raylib_context.handle.window_should_close() {
