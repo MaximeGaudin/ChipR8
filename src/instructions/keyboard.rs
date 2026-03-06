@@ -17,7 +17,7 @@ impl Instruction for SkipIfKeyPressed {
     }
 
     fn execute(&self, vm: &mut VM) {
-        // TODO
+        todo!()
     }
 }
 
@@ -30,6 +30,6 @@ impl Instruction for SkipIfKeyNotPressed {
     }
 
     fn execute(&self, vm: &mut VM) {
-        // TODO
+        todo!()
     }
 }

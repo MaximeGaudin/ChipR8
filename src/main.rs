@@ -38,6 +38,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         screen::render(&mut vm, &mut raylib_context);
         vm::update_timer(&mut vm);
+        // TODO: Add buzzer
     }
 
     Ok(())
