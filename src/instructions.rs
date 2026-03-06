@@ -113,6 +113,32 @@ impl SkipIfNotValue {
     }
 }
 
+
+// 5xkk
+pub struct SkipIfRegister {
+    pub register_x: usize,
+    pub register_y: usize,
+}
+
+impl SkipIfRegister {
+    fn disassemble(&self) -> String {
+        format!("SE V{:1X}, V{:1X}", self.register_x, self.register_y)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec![
+            "Skip next instruction if Vx = Vy.",
+            "The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2.",
+        ]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        if vm.registers[self.register_x] == vm.registers[self.register_y]  {
+            vm.program_counter += 2
+        }
+    }
+}
+
 // 6kkk
 pub struct LoadValue {
     pub register: usize,
@@ -136,22 +162,29 @@ impl LoadValue {
     }
 }
 
-// Annn
-pub struct LoadI {
-    pub value: usize,
+
+// 9xkk
+pub struct SkipIfNotRegister {
+    pub register_x: usize,
+    pub register_y: usize,
 }
 
-impl LoadI {
+impl SkipIfNotRegister {
     fn disassemble(&self) -> String {
-        format!("LD I, {:03X}", self.value)
+        format!("SNE V{:1X}, V{:1X}", self.register_x, self.register_y)
     }
 
     fn documentation(&self) -> Vec<&str> {
-        vec!["Set I = nnn.", "The value of register I is set to nnn."]
+        vec![
+            "Skip next instruction if Vx != Vy.",
+            "The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.",
+        ]
     }
 
     fn execute(&self, vm: &mut VM) {
-        vm.i = self.value;
+        if vm.registers[self.register_x] != vm.registers[self.register_y]  {
+            vm.program_counter += 2
+        }
     }
 }
 
@@ -170,11 +203,32 @@ impl AddValue {
         vec![
             "Set Vx = Vx + kk.",
             "Adds the value kk to the value of register Vx, then stores the result in Vx.",
+            "When overflow happen, ignore the overflow."
         ]
     }
 
     fn execute(&self, vm: &mut VM) {
-        vm.registers[self.register] = vm.registers[self.register] + self.value;
+        vm.registers[self.register] = vm.registers[self.register].wrapping_add(self.value);
+    }
+}
+
+
+// Annn
+pub struct LoadI {
+    pub value: usize,
+}
+
+impl LoadI {
+    fn disassemble(&self) -> String {
+        format!("LD I, {:03X}", self.value)
+    }
+
+    fn documentation(&self) -> Vec<&str> {
+        vec!["Set I = nnn.", "The value of register I is set to nnn."]
+    }
+
+    fn execute(&self, vm: &mut VM) {
+        vm.i = self.value;
     }
 }
 
@@ -260,8 +314,11 @@ pub enum Instruction {
     LDI(LoadI),
     DRW(Draw),
     ADV(AddValue),
+
     SEV(SkipIfValue),
     SENV(SkipIfNotValue),
+    SER(SkipIfRegister),
+    SENR(SkipIfNotRegister),
 }
 
 impl Instruction {
@@ -274,7 +331,9 @@ impl Instruction {
             Instruction::DRW(i) => i.disassemble(),
             Instruction::ADV(i) => i.disassemble(),
             Instruction::SEV(i) => i.disassemble(),
+            Instruction::SER(i) => i.disassemble(),
             Instruction::SENV(i) => i.disassemble(),
+            Instruction::SENR(i) => i.disassemble(),
 
             Instruction::UNK(i) => i.disassemble(),
         }
@@ -289,7 +348,9 @@ impl Instruction {
             Instruction::DRW(i) => i.execute(vm),
             Instruction::ADV(i) => i.execute(vm),
             Instruction::SEV(i) => i.execute(vm),
+            Instruction::SER(i) => i.execute(vm),
             Instruction::SENV(i) => i.execute(vm),
+            Instruction::SENR(i) => i.execute(vm),
 
             Instruction::UNK(i) => i.execute(vm),
         }
@@ -313,6 +374,10 @@ pub fn opcode_to_instruction(opcode: u16) -> Instruction {
             register: ((opcode & 0x0F00) >> 8) as usize,
             value: (opcode & 0x00FF) as u8,
         }),
+        0x5000 => Instruction::SER(SkipIfRegister {
+            register_x: ((opcode & 0x0F00) >> 8) as usize,
+            register_y: ((opcode & 0x00F0) >> 4) as usize,
+        }),
         0x6000 => Instruction::LDV(LoadValue {
             register: ((opcode & 0x0F00) >> 8) as usize,
             value: (opcode & 0x00FF) as u8,
@@ -320,6 +385,10 @@ pub fn opcode_to_instruction(opcode: u16) -> Instruction {
         0x7000 => Instruction::ADV(AddValue {
             register: ((opcode & 0x0F00) >> 8) as usize,
             value: (opcode & 0x00FF) as u8,
+        }),
+        0x9000 => Instruction::SENR(SkipIfNotRegister {
+            register_x: ((opcode & 0x0F00) >> 8) as usize,
+            register_y: ((opcode & 0x00F0) >> 4) as usize,
         }),
         0xA000 => Instruction::LDI(LoadI {
             value: (opcode & 0x0FFF) as usize,
