@@ -160,7 +160,7 @@ impl Instruction for SubRegisterToRegister {
         let value_x = vm.registers[self.register_x];
         let value_y = vm.registers[self.register_y];
 
-        let carry = if value_x > value_y { 1 } else { 0 };
+        let carry = if value_x >= value_y { 1 } else { 0 };
 
         // It will naturally truncate/wrap when cast back to u8
         vm.registers[self.register_x] = value_x.wrapping_sub(value_y);
@@ -183,7 +183,7 @@ impl Instruction for SubReverseRegisterToRegister {
         let value_x = vm.registers[self.register_x];
         let value_y = vm.registers[self.register_y];
 
-        let carry = if value_y > value_x { 1 } else { 0 };
+        let carry = if value_y >= value_x { 1 } else { 0 };
 
         // It will naturally truncate/wrap when cast back to u8
         vm.registers[self.register_x] = value_y.wrapping_sub(value_x);

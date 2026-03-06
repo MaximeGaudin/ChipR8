@@ -9,7 +9,7 @@ mod vm;
 fn fetch_decode_execute(vm: &mut vm::VM) {
     let instruction = vm::get_current_instruction(vm);
 
-    println!("{}", instruction.disassemble());
+    // println!("{}", instruction.disassemble());
 
     if instruction.is_unknown() {
         panic!("NOT IMPLEMENTED")
