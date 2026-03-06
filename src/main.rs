@@ -2,7 +2,7 @@ use raylib::prelude::*;
 use std::{error::Error, process::exit};
 
 mod instructions;
-use instructions::*;
+use instructions::base::Instruction;
 
 mod vm;
 use vm::VM;

@@ -1,4 +1,5 @@
-use crate::instructions::*;
+use crate::instructions::base::Instruction;
+use crate::instructions::base::opcode_to_instruction;
 
 pub const SCREEN_WIDTH: usize = 64;
 pub const SCREEN_HEIGHT: usize = 32;
