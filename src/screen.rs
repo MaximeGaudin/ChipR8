@@ -1,49 +1,38 @@
-use raylib::prelude::*;
+use macroquad::prelude::*;
 
-use crate::vm::{self, SCREEN_WIDTH, VM};
+use crate::vm::{self, VM};
 
-static SCALE: i32 = 15;
-static WIDTH: i32 = 64 * SCALE;
-static HEIGHT: i32 = 32 * SCALE;
+pub static SCALE: f32 = 15.0;
 
-static BACKGROUND_COLOR: Color = Color::WHITE;
-static PIXEL_COLOR: Color = Color::BLACK;
+static BACKGROUND_COLOR: Color = WHITE;
+static PIXEL_COLOR: Color = BLACK;
 
 pub static FRAME_RATE: u32 = 60;
 
-pub struct RaylibContext {
-    pub handle: RaylibHandle,
-    pub thread: RaylibThread,
-}
-
-pub fn init() -> RaylibContext {
-    let (mut rl, thread) = raylib::init().size(WIDTH, HEIGHT).title("Chip R8").build();
-
-    rl.set_target_fps(FRAME_RATE);
-
-    RaylibContext { handle: rl, thread }
-}
-
-pub fn render(vm: &mut VM, context: &mut RaylibContext) {
-    let mut d = context.handle.begin_drawing(&context.thread);
-
-    d.clear_background(BACKGROUND_COLOR);
+pub fn render(vm: &mut VM) {
+    clear_background(BACKGROUND_COLOR);
 
     for y in 0..vm::SCREEN_HEIGHT {
         for x in 0..vm::SCREEN_WIDTH {
             let screen_index = x + (y * vm::SCREEN_WIDTH);
 
             if vm.screen[screen_index] == 1 {
-                d.draw_rectangle(
-                    (x as i32) * SCALE,
-                    (y as i32) * SCALE,
-                    SCALE,
-                    SCALE,
+                draw_rectangle(
+                    (x as f32) * SCALE,
+                    (y as f32) * SCALE,
+                    SCALE as f32,
+                    SCALE as f32,
                     PIXEL_COLOR,
                 );
             }
         }
     }
 
-    d.draw_fps((SCREEN_WIDTH as i32) * SCALE - 90, 10);
+    draw_text(
+        &format!("FPS: {}", get_fps()),
+        (64.0 * SCALE) - 90.0,
+        20.0,
+        20.0,
+        GREEN,
+    );
 }

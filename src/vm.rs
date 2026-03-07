@@ -71,10 +71,9 @@ pub fn init(mode: EmulationMode) -> VM {
     return vm;
 }
 
-pub fn load_rom(path: String, vm: &mut VM) -> Result<(), std::io::Error> {
-    let content = std::fs::read(path)?;
-    for i in 0..content.len() {
-        vm.memory[PROGRAM_START + i] = content[i];
+pub fn load_rom(rom_data: &[u8], vm: &mut VM) -> Result<(), std::io::Error> {
+    for i in 0..rom_data.len() {
+        vm.memory[PROGRAM_START + i] = rom_data[i];
     }
 
     Ok(())

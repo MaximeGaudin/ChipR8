@@ -16,8 +16,8 @@ impl Instruction for SkipIfKeyPressed {
         format!("SKP V{:1X}", self.register)
     }
 
-    fn execute(&self, vm: &mut VM) {
-        todo!()
+    fn execute(&self, _vm: &mut VM) {
+        // todo!()
     }
 }
 
@@ -29,7 +29,7 @@ impl Instruction for SkipIfKeyNotPressed {
         format!("SKNP V{:1X}", self.register)
     }
 
-    fn execute(&self, vm: &mut VM) {
-        todo!()
+    fn execute(&self, _vm: &mut VM) {
+        // todo!()
     }
 }

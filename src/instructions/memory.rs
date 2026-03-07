@@ -1,4 +1,4 @@
-use rand::{Rng, rng};
+
 
 use crate::{instructions::base::Instruction, vm::VM};
 
@@ -110,7 +110,7 @@ impl Instruction for LoadBCD {
 //  See instruction 8xy2 for more information on AND.
 impl Instruction for LoadRandomIntoRegister {
     fn execute(&self, vm: &mut VM) {
-        let random_byte: u8 = rand::random();
+        let random_byte: u8 = quad_rand::gen_range(0, 255) as u8;
         vm.registers[self.register] = random_byte & self.mask;
     }
 
