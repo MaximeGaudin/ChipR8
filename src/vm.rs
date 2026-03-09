@@ -27,8 +27,8 @@ pub const CPU_TICK_RATE: u32 = 1000;
 #[derive(PartialEq, Debug)]
 pub enum EmulationMode {
     Chip8,
-    SuperChip,
-    XoChip,
+    // SuperChip,
+    // XoChip,
 }
 
 pub struct VM {
